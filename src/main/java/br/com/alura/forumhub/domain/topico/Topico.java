@@ -2,7 +2,6 @@ package br.com.alura.forumhub.domain.topico;
 
 import br.com.alura.forumhub.domain.resposta.Resposta;
 import br.com.alura.forumhub.domain.usuario.Usuario;
-import br.com.alura.forumhub.dto.topico.DadosCadastroTopico;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -40,6 +39,14 @@ public class Topico {
 
     @OneToMany(mappedBy = "topico", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Resposta> respostas;
+
+    public Topico(String titulo, String mensagem, Usuario autor, Curso curso) {
+        this.titulo = titulo;
+        this.mensagem = mensagem;
+        this.autor = autor;
+        this.curso = curso;
+        this.dataCriacao = LocalDateTime.now().withNano(0);
+    }
 }
 
 

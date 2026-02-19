@@ -9,6 +9,7 @@ import br.com.alura.forumhub.repository.TopicoRepository;
 import br.com.alura.forumhub.repository.UsuarioRepository;
 import br.com.alura.forumhub.exception.ValidacaoTopicoException;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,5 +44,11 @@ public class TopicoService {
     @Transactional(readOnly = true)
     public Page<DadosConsultaTopico> listar(Integer ano, String curso, StatusTopico status, Pageable paginacao) {
         return topicoRepository.filtrar(ano, curso, status, paginacao).map(DadosConsultaTopico::new);
+    }
+
+    @Transactional(readOnly = true)
+    public Topico detalhar(Long id) {
+        return topicoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Tópico não encontrado"));
     }
 }

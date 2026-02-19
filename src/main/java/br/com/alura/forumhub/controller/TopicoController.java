@@ -40,4 +40,10 @@ public class TopicoController {
         var pagina = topicoService.listar(ano, curso, status, paginacao);
         return ResponseEntity.ok(pagina);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DadosConsultaTopico> detalhar(@PathVariable Long id) {
+        var topico = topicoService.detalhar(id);
+        return ResponseEntity.ok(new DadosConsultaTopico(topico));
+    }
 }

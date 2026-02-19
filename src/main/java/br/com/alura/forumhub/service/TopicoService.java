@@ -1,14 +1,19 @@
 package br.com.alura.forumhub.service;
 
+import br.com.alura.forumhub.domain.topico.StatusTopico;
 import br.com.alura.forumhub.dto.topico.DadosCadastroTopico;
 import br.com.alura.forumhub.domain.topico.Topico;
+import br.com.alura.forumhub.dto.topico.DadosConsultaTopico;
 import br.com.alura.forumhub.repository.CursoRepository;
 import br.com.alura.forumhub.repository.TopicoRepository;
 import br.com.alura.forumhub.repository.UsuarioRepository;
 import br.com.alura.forumhub.exception.ValidacaoTopicoException;
-import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,5 +38,10 @@ public class TopicoService {
         var topico = new Topico(dados.titulo(), dados.mensagem(), autor, curso);
         topicoRepository.save(topico);
         return topico;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<DadosConsultaTopico> listar(Integer ano, String curso, StatusTopico status, Pageable paginacao) {
+        return topicoRepository.filtrar(ano, curso, status, paginacao).map(DadosConsultaTopico::new);
     }
 }

@@ -5,17 +5,17 @@ import br.com.alura.forumhub.domain.topico.Topico;
 
 import java.time.LocalDateTime;
 
-public record DadosDetalhamentoTopico(
+public record DadosConsultaTopico(
         Long id,
         String titulo,
         String mensagem,
         LocalDateTime dataCriacao,
         StatusTopico status,
-        Long autorId,
-        Long cursoId
+        String autor,
+        String curso
 ) {
-    public DadosDetalhamentoTopico(Topico t) {
+    public DadosConsultaTopico(Topico t) {
         this(t.getId(), t.getTitulo(), t.getMensagem(), t.getDataCriacao(),
-                t.getStatus(), t.getAutor().getId(), t.getCurso().getId());
+                t.getStatus(), t.getAutor().getNome(), t.getCurso().getNome());
     }
 }

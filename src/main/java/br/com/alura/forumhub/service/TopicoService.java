@@ -1,6 +1,7 @@
 package br.com.alura.forumhub.service;
 
 import br.com.alura.forumhub.domain.topico.StatusTopico;
+import br.com.alura.forumhub.dto.topico.DadosAtualizacaoTopico;
 import br.com.alura.forumhub.dto.topico.DadosCadastroTopico;
 import br.com.alura.forumhub.domain.topico.Topico;
 import br.com.alura.forumhub.dto.topico.DadosConsultaTopico;
@@ -49,6 +50,18 @@ public class TopicoService {
     @Transactional(readOnly = true)
     public Topico detalhar(Long id) {
         return topicoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Tópico não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Tópico não encontrado."));
+    }
+
+    @Transactional
+    public Topico atualizar(Long id, DadosAtualizacaoTopico dados) {
+        var topico = topicoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Tópico não encontrado."));
+
+        var curso = cursoRepository.findById(dados.cursoId())
+                .orElseThrow(() -> new ValidacaoTopicoException("Id do curso informado não existe."));
+
+        topico.atualizarInformacoes(dados.titulo(), dados.mensagem(), dados.status(), curso);
+        return topico;
     }
 }

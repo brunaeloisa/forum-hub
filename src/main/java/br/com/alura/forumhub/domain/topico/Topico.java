@@ -47,6 +47,13 @@ public class Topico {
         this.curso = curso;
         this.dataCriacao = LocalDateTime.now().withNano(0);
     }
+
+    public void atualizarInformacoes(String titulo, String mensagem, StatusTopico status, Curso curso) {
+        this.titulo = titulo;
+        this.mensagem = mensagem;
+        this.status = status;
+        this.curso = curso;
+    }
 }
 
 

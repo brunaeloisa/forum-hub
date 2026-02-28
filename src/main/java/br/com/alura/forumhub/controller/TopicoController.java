@@ -1,6 +1,7 @@
 package br.com.alura.forumhub.controller;
 
 import br.com.alura.forumhub.domain.topico.StatusTopico;
+import br.com.alura.forumhub.dto.topico.DadosAtualizacaoTopico;
 import br.com.alura.forumhub.dto.topico.DadosCadastroTopico;
 import br.com.alura.forumhub.dto.topico.DadosTopicoCriado;
 import br.com.alura.forumhub.dto.topico.DadosConsultaTopico;
@@ -45,5 +46,12 @@ public class TopicoController {
     public ResponseEntity<DadosConsultaTopico> detalhar(@PathVariable Long id) {
         var topico = topicoService.detalhar(id);
         return ResponseEntity.ok(new DadosConsultaTopico(topico));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<DadosConsultaTopico> atualizar(@PathVariable Long id,
+                                                         @RequestBody @Valid DadosAtualizacaoTopico dados) {
+        var topicoAtualizado = topicoService.atualizar(id, dados);
+        return ResponseEntity.ok(new DadosConsultaTopico(topicoAtualizado));
     }
 }

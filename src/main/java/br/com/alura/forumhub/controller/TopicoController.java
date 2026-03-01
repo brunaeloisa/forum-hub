@@ -54,4 +54,10 @@ public class TopicoController {
         var topicoAtualizado = topicoService.atualizar(id, dados);
         return ResponseEntity.ok(new DadosConsultaTopico(topicoAtualizado));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(@PathVariable Long id) {
+        topicoService.excluir(id);
+        return ResponseEntity.noContent().build();
+    }
 }

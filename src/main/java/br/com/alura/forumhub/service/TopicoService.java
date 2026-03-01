@@ -27,7 +27,7 @@ public class TopicoService {
 
     @Transactional
     public Topico cadastrar(DadosCadastroTopico dados) {
-        if (topicoRepository.existsByTituloAndMensagem(dados.titulo(), dados.mensagem())) {
+        if (topicoRepository.existsByTituloAndMensagemAndAtivoTrue(dados.titulo(), dados.mensagem())) {
             throw new ValidacaoTopicoException("Tópico duplicado.");
         }
 
@@ -49,13 +49,13 @@ public class TopicoService {
 
     @Transactional(readOnly = true)
     public Topico detalhar(Long id) {
-        return topicoRepository.findById(id)
+        return topicoRepository.findByIdAndAtivoTrue(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tópico não encontrado."));
     }
 
     @Transactional
     public Topico atualizar(Long id, DadosAtualizacaoTopico dados) {
-        var topico = topicoRepository.findById(id)
+        var topico = topicoRepository.findByIdAndAtivoTrue(id)
                 .orElseThrow(() -> new EntityNotFoundException("Tópico não encontrado."));
 
         var curso = cursoRepository.findById(dados.cursoId())
@@ -63,5 +63,13 @@ public class TopicoService {
 
         topico.atualizarInformacoes(dados.titulo(), dados.mensagem(), dados.status(), curso);
         return topico;
+    }
+
+    @Transactional
+    public void excluir(Long id) {
+        var topico = topicoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Tópico não encontrado."));
+
+        topico.excluir();
     }
 }

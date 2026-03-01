@@ -8,12 +8,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface TopicoRepository extends JpaRepository<Topico, Long> {
-    boolean existsByTituloAndMensagem(String titulo, String mensagem);
+    boolean existsByTituloAndMensagemAndAtivoTrue(String titulo, String mensagem);
 
     @Query("""
         SELECT t FROM Topico t
-        WHERE (:ano IS NULL OR YEAR(t.dataCriacao) = :ano)
+        WHERE t.ativo = true
+        AND (:ano IS NULL OR YEAR(t.dataCriacao) = :ano)
         AND (:curso IS NULL OR t.curso.nome LIKE %:curso%)
         AND (:status IS NULL OR t.status = :status)
     """)
@@ -23,4 +26,6 @@ public interface TopicoRepository extends JpaRepository<Topico, Long> {
             @Param("status") StatusTopico status,
             Pageable paginacao
     );
+
+    Optional<Topico> findByIdAndAtivoTrue(Long id);
 }

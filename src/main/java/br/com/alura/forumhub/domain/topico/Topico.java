@@ -26,6 +26,8 @@ public class Topico {
 
     private LocalDateTime dataCriacao;
 
+    private boolean ativo = true;
+
     @Enumerated(value = EnumType.STRING)
     private StatusTopico status = StatusTopico.NAO_RESPONDIDO;
 
@@ -53,6 +55,10 @@ public class Topico {
         this.mensagem = mensagem;
         this.status = status;
         this.curso = curso;
+    }
+
+    public void excluir() {
+        this.ativo = false;
     }
 }
 

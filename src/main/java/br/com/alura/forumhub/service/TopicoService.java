@@ -1,6 +1,9 @@
 package br.com.alura.forumhub.service;
 
+import br.com.alura.forumhub.domain.topico.Curso;
 import br.com.alura.forumhub.domain.topico.StatusTopico;
+import br.com.alura.forumhub.domain.usuario.Perfil;
+import br.com.alura.forumhub.domain.usuario.Usuario;
 import br.com.alura.forumhub.dto.topico.DadosAtualizacaoTopico;
 import br.com.alura.forumhub.dto.topico.DadosCadastroTopico;
 import br.com.alura.forumhub.domain.topico.Topico;
@@ -14,6 +17,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,11 +35,8 @@ public class TopicoService {
             throw new ValidacaoTopicoException("Tópico duplicado.");
         }
 
-        var curso = cursoRepository.findById(dados.cursoId())
-                .orElseThrow(() -> new ValidacaoTopicoException("Id do curso informado não existe."));
-
-        var autor = usuarioRepository.findById(dados.autorId())
-                .orElseThrow(() -> new ValidacaoTopicoException("Id do usuário informado não existe."));
+        var curso = buscaCursoPorId(dados.cursoId());
+        var autor = buscaAutorPorId(dados.autorId());
 
         var topico = new Topico(dados.titulo(), dados.mensagem(), autor, curso);
         topicoRepository.save(topico);
@@ -49,27 +50,57 @@ public class TopicoService {
 
     @Transactional(readOnly = true)
     public Topico detalhar(Long id) {
-        return topicoRepository.findByIdAndAtivoTrue(id)
-                .orElseThrow(() -> new EntityNotFoundException("Tópico não encontrado."));
+        return buscaTopicoPorId(id);
     }
 
     @Transactional
-    public Topico atualizar(Long id, DadosAtualizacaoTopico dados) {
-        var topico = topicoRepository.findByIdAndAtivoTrue(id)
-                .orElseThrow(() -> new EntityNotFoundException("Tópico não encontrado."));
+    public Topico atualizar(Long id, DadosAtualizacaoTopico dados, Usuario usuarioLogado) {
+        var topico = buscaTopicoPorId(id);
 
-        var curso = cursoRepository.findById(dados.cursoId())
-                .orElseThrow(() -> new ValidacaoTopicoException("Id do curso informado não existe."));
+        verificarPermissao(topico, usuarioLogado);
+
+        var curso = buscaCursoPorId(dados.cursoId());
 
         topico.atualizarInformacoes(dados.titulo(), dados.mensagem(), dados.status(), curso);
         return topico;
     }
 
     @Transactional
-    public void excluir(Long id) {
-        var topico = topicoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Tópico não encontrado."));
+    public void excluir(Long id, Usuario usuarioLogado) {
+        var topico = buscaTopicoPorId(id);
+
+        verificarPermissao(topico, usuarioLogado);
 
         topico.excluir();
+    }
+
+    private void verificarPermissao(Topico topico, Usuario usuarioLogado) {
+        if (!temPermissao(topico, usuarioLogado)) {
+            throw new AccessDeniedException("Usuário não tem permissão para esta operação");
+        }
+    }
+
+    private boolean temPermissao(Topico topico, Usuario usuarioLogado) {
+        boolean ehAutor = topico.getAutor().getId().equals(usuarioLogado.getId());
+        boolean ehInstrutorOuAdmin = usuarioLogado.getPerfis().stream()
+                .map(Perfil::getNome)
+                .anyMatch(n -> n.equals("ROLE_ADMIN") || n.equals("ROLE_INSTRUTOR"));
+
+        return ehAutor || ehInstrutorOuAdmin;
+    }
+
+    private Topico buscaTopicoPorId(Long id) {
+        return topicoRepository.findByIdAndAtivoTrue(id)
+                .orElseThrow(() -> new EntityNotFoundException("Tópico não encontrado."));
+    }
+
+    private Curso buscaCursoPorId(Long id) {
+        return cursoRepository.findById(id)
+                .orElseThrow(() -> new ValidacaoTopicoException("Id do curso informado não existe."));
+    }
+
+    private Usuario buscaAutorPorId(Long id) {
+        return usuarioRepository.findById(id)
+                .orElseThrow(() -> new ValidacaoTopicoException("Id do usuário informado não existe."));
     }
 }

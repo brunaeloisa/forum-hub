@@ -1,6 +1,7 @@
 package br.com.alura.forumhub.controller;
 
 import br.com.alura.forumhub.domain.topico.StatusTopico;
+import br.com.alura.forumhub.domain.usuario.Usuario;
 import br.com.alura.forumhub.dto.topico.DadosAtualizacaoTopico;
 import br.com.alura.forumhub.dto.topico.DadosCadastroTopico;
 import br.com.alura.forumhub.dto.topico.DadosTopicoCriado;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -50,14 +52,15 @@ public class TopicoController {
 
     @PutMapping("/{id}")
     public ResponseEntity<DadosConsultaTopico> atualizar(@PathVariable Long id,
-                                                         @RequestBody @Valid DadosAtualizacaoTopico dados) {
-        var topicoAtualizado = topicoService.atualizar(id, dados);
+                                                         @RequestBody @Valid DadosAtualizacaoTopico dados,
+                                                         @AuthenticationPrincipal Usuario usuarioLogado) {
+        var topicoAtualizado = topicoService.atualizar(id, dados, usuarioLogado);
         return ResponseEntity.ok(new DadosConsultaTopico(topicoAtualizado));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        topicoService.excluir(id);
+    public ResponseEntity<Void> excluir(@PathVariable Long id, @AuthenticationPrincipal Usuario usuarioLogado) {
+        topicoService.excluir(id, usuarioLogado);
         return ResponseEntity.noContent().build();
     }
 }

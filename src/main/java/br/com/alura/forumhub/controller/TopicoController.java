@@ -7,6 +7,7 @@ import br.com.alura.forumhub.dto.topico.DadosCadastroTopico;
 import br.com.alura.forumhub.dto.topico.DadosTopicoCriado;
 import br.com.alura.forumhub.dto.topico.DadosConsultaTopico;
 import br.com.alura.forumhub.service.TopicoService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/topicos")
+@SecurityRequirement(name = "bearer-key")
 public class TopicoController {
     private final TopicoService topicoService;
 
